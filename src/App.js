@@ -1,26 +1,41 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import CardContainer from './components/CardContainer.js'
+import SearchForm from './components/SearchForm.js'
 
-function App() {
+
+class App extends React.Component {
+  state ={
+    cards: [],
+    searchTerm: ""
+  }
+
+  componentDidMount = () => {
+    fetch('https://mighty-wildwood-67431.herokuapp.com/cards')
+    .then(response => response.json())
+    .then(cards => this.setState({cards}))
+  }
+
+  onInputChange = (e) => {
+    console.log("on change function", e.target.value)
+    this.setState({searchTerm: e.target.value})
+  }
+
+  filterCards = (searchTerm) => {
+    return this.state.cards.filter(card => {
+      return card.prompt.toLowerCase().includes(searchTerm.toLowerCase())
+    })
+  }
+  
+  render () {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <SearchForm onInputChange={this.onInputChange} searchTerm={this.state.searchTerm} />
+      <CardContainer cards={this.filterCards(this.state.searchTerm)}/>
     </div>
   );
+}
 }
 
 export default App;
